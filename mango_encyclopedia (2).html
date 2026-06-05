@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>বাংলাদেশের আমের এনসাইক্লোপিডিয়া</title>
+    <meta name="theme-color" content="#2e7d32">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --secondary: #f57f17;
+            --bg-color: #f1f8e9;
+            --text-main: #2c3e50;
+            --text-muted: #546e7a;
+            --card-bg: #ffffff;
+            --mango-yellow: #ffeb3b;
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Hind Siliguri', sans-serif; 
+        }
+        
+        body { 
+            background-color: #cfd8dc; 
+            display: flex; 
+            justify-content: center; 
+            color: var(--text-main);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px; 
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.15);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 30px 20px 20px;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 6px 12px rgba(46, 125, 50, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '🥭';
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.1;
+            right: -20px;
+            top: -20px;
+            transform: rotate(15deg);
+        }
+
+        header h1 { 
+            font-size: 28px; 
+            font-weight: 700;
+            margin-bottom: 5px; 
+            color: var(--mango-yellow); 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        header p { 
+            font-size: 15px; 
+            opacity: 0.9; 
+            font-weight: 400;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 25px 20px;
+            flex-grow: 1;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 130px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--secondary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before, .card:active::before {
+            transform: scaleX(1);
+        }
+
+        .card:active { 
+            transform: scale(0.95); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+
+        .card .icon { 
+            font-size: 36px; 
+            margin-bottom: 12px; 
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .card h3 { 
+            font-size: 16px; 
+            color: var(--primary-dark); 
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .full-width { 
+            grid-column: span 2; 
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 20px 25px;
+            min-height: auto;
+        }
+        .full-width .icon { margin-bottom: 0; margin-right: 20px; font-size: 42px;}
+        .full-width h3 { font-size: 18px; text-align: left;}
+
+        .modal {
+            display: none; 
+            position: absolute; /* Changed to absolute to fit container */
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 100%;
+            height: 85%;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 0;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fdfdfd;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            position: sticky;
+            top: 0;
+        }
+
+        .modal-title { 
+            color: var(--primary-dark); 
+            font-size: 20px; 
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none; 
+            background: #f1f1f1;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .close-btn:active { background: #e0e0e0; color: #d32f2f; }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
+        .modal-body::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+
+        .modal-body h4 {
+            color: var(--secondary);
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px dashed #ffe0b2;
+        }
+        
+        .modal-body h4:first-child { margin-top: 0; }
+
+        .modal-body p { 
+            font-size: 15.5px; 
+            line-height: 1.7; 
+            color: #455a64; 
+            margin-bottom: 12px; 
+            text-align: justify;
+        }
+
+        .modal-body ul { 
+            padding-left: 20px; 
+            margin-bottom: 15px;
+        }
+
+        .modal-body li { 
+            font-size: 15.5px; 
+            line-height: 1.6; 
+            color: #455a64; 
+            margin-bottom: 8px; 
+        }
+
+        .modal-body li b { color: var(--primary-dark); }
+        
+        .highlight-box {
+            background-color: #fff3e0;
+            border-left: 4px solid var(--secondary);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8f5e9;
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <header>
+        <h1>বাংলাদেশের আম</h1>
+        <p>ইতিহাস, ঐতিহ্য ও স্বাদের পূর্ণাঙ্গ বিশ্বকোষ</p>
+    </header>
+
+    <div class="grid-container">
+        <!-- Row 1 -->
+        <div class="card full-width" onclick="openModal('encyclopedia')">
+            <div class="icon">🥭</div>
+            <div>
+                <h3>আমের বিশ্বকোষ</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top:4px;">বাংলাদেশের সকল জনপ্রিয় আমের তালিকা</p>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="card" onclick="openModal('history')">
+            <div class="icon">📜</div>
+            <h3>ইতিহাস ও ঐতিহ্য</h3>
+        </div>
+        <div class="card" onclick="openModal('gitags')">
+            <div class="icon">🏅</div>
+            <h3>জিআই (GI) সনদ</h3>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="card" onclick="openModal('calendar')">
+            <div class="icon">🗓️</div>
+            <h3>আম পাকার ক্যালেন্ডার</h3>
+        </div>
+        <div class="card" onclick="openModal('regions')">
+            <div class="icon">🗺️</div>
+            <h3>উৎপাদন অঞ্চল</h3>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="card" onclick="openModal('economy')">
+            <div class="icon">📈</div>
+            <h3>অর্থনীতি ও রপ্তানি</h3>
+        </div>
+        <div class="card" onclick="openModal('science')">
+            <div class="icon">⚕️</div>
+            <h3>পুষ্টি ও স্বাস্থ্য</h3>
+        </div>
+
+        <!-- Row 5 (New additions) -->
+        <div class="card" onclick="openModal('health_warnings')">
+            <div class="icon">⚠️</div>
+            <h3>সতর্কতা ও অপকারিতা</h3>
+        </div>
+        <div class="card" onclick="openModal('tips_storage')">
+            <div class="icon">💡</div>
+            <h3>নিয়ম ও সংরক্ষণ</h3>
+        </div>
+
+        <!-- Row 6 (New additions) -->
+        <div class="card full-width" onclick="openModal('buying_guide')">
+            <div class="icon">🕵️‍♂️</div>
+            <div>
+                <h3>রাসায়নিক মুক্ত আম চেনা</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top:4px;">ফরমালিন ও কার্বাইড মুক্ত আম চেনার উপায়</p>
+            </div>
+        </div>
+
+        <!-- Row - Naming History -->
+        <div class="card full-width" onclick="openModal('name_origins')">
+            <div class="icon">📖</div>
+            <div>
+                <h3>নামকরণের চমকপ্রদ গল্প</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top:4px;">ফজলি, ল্যাংড়া বা হাঁড়িভাঙ্গা নামগুলো কীভাবে এলো?</p>
+            </div>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="card full-width" onclick="openModal('recipes')">
+            <div class="icon">🍽️</div>
+            <div>
+                <h3>আমের নানা পদ</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top:4px;">আচার, জুস থেকে শুরু করে আমসত্ত্ব</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="m-title" class="modal-title"><span id="m-icon"></span> <span>Title</span></h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div id="m-body" class="modal-body">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const encyclopediaData = {
+        'encyclopedia': {
+            icon: '🥭',
+            title: 'বাংলাদেশের আমের বিশ্বকোষ',
+            content: `
+                <p>বাংলাদেশে প্রায় <b>আড়াইশ</b> জাতের আম উৎপাদিত হয়। এর মধ্যে সবচেয়ে জনপ্রিয় এবং সুস্বাদু কিছু জাতের বিস্তারিত নিচে দেওয়া হলো:</p>
+                
+                <h4>১. হিমসাগর / ক্ষীরসাপাত <span class="tag">রাজশাহীর জিআই</span></h4>
+                <p>আমের রাজা বলা হয় একে। এর ত্বক মসৃণ, রং সবুজাভ-হলুদ। শাঁস কমলা রঙের, সম্পূর্ণ আঁশহীন এবং অত্যন্ত মিষ্টি। এর ঘ্রাণ পাগল করা।</p>
+                
+                <h4>২. ল্যাংড়া <span class="tag">চাঁপাইনবাবগঞ্জের জিআই</span></h4>
+                <p>সবচেয়ে সুপরিচিত আমের একটি। খোসা খুবই পাতলা। শাঁস হলদেটে, রসালো এবং সামান্য টক-মিষ্টির এক অদ্ভুত ভারসাম্য রয়েছে। এর সুগন্ধ অনেক দূর পর্যন্ত ছড়ায়।</p>
+                
+                <h4>৩. আম্রপালি</h4>
+                <p>এটি 'নিলম' এবং 'দশেহরি' আমের একটি সংকর জাত (Hybrid)। আকারে ছোট হলেও এটি বাংলাদেশের অন্যতম মিষ্টি আম। শাঁস গাঢ় কমলা রঙের এবং আঁশহীন।</p>
+                
+                <h4>৪. ফজলি <span class="tag">রাজশাহীর জিআই</span></h4>
+                <p>আকারে অনেক বড় হয় (কখনো ১ কেজির বেশি)। এটি দেরিতে পাকে। এর খোসা কিছুটা পুরু, শাঁস হলুদ, সুমিষ্ট এবং আঁশবিহীন।</p>
+
+                <h4>৫. হাঁড়িভাঙ্গা</h4>
+                <p>রংপুর অঞ্চলের বিখ্যাত আম। দেখতে কিছুটা গোলগাল ও হাঁড়ির মতো। কাঁচা অবস্থাতেই এটি মিষ্টি হতে শুরু করে। এর শাঁস অত্যন্ত রসালো ও সুস্বাদু।</p>
+
+                <h4>৬. গোপালভোগ</h4>
+                <p>মৌসুমের একেবারে শুরুতে এই আম পাকে। আকারে মাঝারি বা ছোট। এর গাঢ় কমলা রঙের শাঁস এবং তীব্র মিষ্টি ঘ্রাণ একে অনন্য করে তুলেছে।</p>
+
+                <h4>৭. আশ্বিনা</h4>
+                <p>আশ্বিন মাসে পাকে বলে এর নাম আশ্বিনা। এটি মৌসুমের সবচেয়ে শেষের আমগুলোর একটি। টক-মিষ্টি স্বাদের জন্য এটি ডাল বা আচারের জন্য দারুণ।</p>
+
+                <h4>৮. গৌড়মতি</h4>
+                <p>নতুন জাতের এই আমটি আগস্ট-সেপ্টেম্বর মাসে পাকে। দেখতে অনেকটা ল্যাংড়ার মতো এবং স্বাদে অসম্ভব মিষ্টি।</p>
+
+                <h4>৯. বারি আম-১১ (বারোমাসি)</h4>
+                <p>বাংলাদেশ কৃষি গবেষণা ইনস্টিটিউট উদ্ভাবিত এই আম বছরে তিনবার ফলন দেয়। ফলে সারা বছরই তাজা আমের স্বাদ নেওয়া যায়।</p>
+
+                <h4>১০. ব্যানানা ম্যাংগো</h4>
+                <p>দেখতে অবিকল কলার মতো লম্বাটে। আঁটি খুব ছোট ও পাতলা, শাঁস বেশি এবং অত্যন্ত মিষ্টি।</p>
+            `
+        },
+        'history': {
+            icon: '📜',
+            title: 'আমের ইতিহাস ও ঐতিহ্য',
+            content: `
+                <p>ভারতীয় উপমহাদেশে আমের ইতিহাস প্রায় ৪,০০০ বছরের পুরনো। হিন্দু ধর্মগ্রন্থে ও বৌদ্ধদের লোককথায় আমের উল্লেখ পাওয়া যায়।</p>
+                
+                <h4>মুঘল আমল</h4>
+                <p>মুঘল সম্রাটরা আমের বড় ভক্ত ছিলেন। সম্রাট আকবর বিহারের দ্বারভাঙায় প্রায় এক লাখ আমের চারা রোপণ করেছিলেন, যা 'লাখবাগ' নামে পরিচিত। মুঘলদের হাত ধরেই আমের উন্নত জাতের কলম (Grafting) পদ্ধতির প্রসার ঘটে।</p>
+                
+                <h4>বাংলার নবাব ও আম</h4>
+                <p>মুর্শিদাবাদ ও রাজশাহীর নবাবরা আমের নতুন জাত উদ্ভাবনে পৃষ্ঠপোষকতা করতেন। 'ফজলি' আমের নামকরণ হয়েছিল মালদহের ফজলু বিবি নামের এক বৃদ্ধার নামানুসারে, যিনি ফকির বেশে থাকা কালেক্টরকে এই আম খেতে দিয়েছিলেন।</p>
+
+                <h4>সাহিত্যে আম</h4>
+                <p>রবীন্দ্রনাথ ঠাকুর থেকে শুরু করে কাজী নজরুল ইসলাম— সবার রচনাতেই আমের স্তুতি রয়েছে। বিশ্বকবির "আম পাতা জোড়া জোড়া" ছড়াটি বাঙালির চিরচেনা।</p>
+            `
+        },
+        'gitags': {
+            icon: '🏅',
+            title: 'জিআই (GI) সনদপ্রাপ্ত আম',
+            content: `
+                <p>ভৌগোলিক নির্দেশক বা GI (Geographical Indication) পণ্য হিসেবে বাংলাদেশের ৩টি আম আন্তর্জাতিক স্বীকৃতি পেয়েছে। এর মানে হলো, এই আমগুলোর গুণগত মান ও স্বাদ নির্দিষ্ট অঞ্চলের মাটি ও আবহাওয়ার কারণে অনন্য।</p>
+
+                <h4>১. রাজশাহীর ক্ষীরসাপাত (২০১৯)</h4>
+                <ul>
+                    <li>বাংলাদেশের <b>৩য়</b> জিআই পণ্য।</li>
+                    <li>দেশের মোট আম উৎপাদনের প্রায় ২০-২৫ শতাংশই ক্ষীরসাপাত।</li>
+                    <li>আঁশহীন, অত্যন্ত সুমিষ্ট স্বাদ এবং মনমাতানো ঘ্রাণের জন্য এটি বিশ্বখ্যাত।</li>
+                </ul>
+
+                <h4>২. রাজশাহীর ফজলি (২০২১)</h4>
+                <ul>
+                    <li>এটি আকারে বড় এবং সুমিষ্ট।</li>
+                    <li>মূলত রাজশাহী এবং চাঁপাইনবাবগঞ্জ অঞ্চলে এর ফলন সবচেয়ে ভালো হয়।</li>
+                </ul>
+
+                <h4>৩. চাঁপাইনবাবগঞ্জের ল্যাংড়া (২০২৩)</h4>
+                <ul>
+                    <li>অতুলনীয় সুবাস এবং পাতলা খোসার জন্য বিখ্যাত।</li>
+                    <li>চাঁপাইনবাবগঞ্জের শিবগঞ্জকে ল্যাংড়া আমের আদি নিবাস মনে করা হয়।</li>
+                </ul>
+            `
+        },
+        'calendar': {
+            icon: '🗓️',
+            title: 'আম পাকার ক্যালেন্ডার',
+            content: `
+                <p>আমের আসল স্বাদ পেতে হলে সঠিক সময়ে সঠিক জাতের আম নির্বাচন করা খুব জরুরি। প্রাকৃতিকভাবে আম পাকার একটি সাধারণ সময়সূচি নিচে দেওয়া হলো:</p>
+                
+                <h4>মে মাসের মাঝামাঝি থেকে</h4>
+                <p>বাজারে সবার আগে চলে আসে <b>গুটি আম</b>। এরপর ধীরে ধীরে আসতে শুরু করে সুমিষ্ট <b>গোপালভোগ</b> ও <b>গোবিন্দভোগ</b>। সাতক্ষীরা অঞ্চলের আম সাধারণত সবার আগে পাকে।</p>
+                
+                <h4>জুন মাস (ভরা মৌসুম)</h4>
+                <p>এই সময়ে মেলে সবচেয়ে সুস্বাদু এবং জনপ্রিয় আমগুলো। <b>ক্ষীরশাপাত</b>, <b>হিমসাগর</b>, <b>ল্যাংড়া</b> এবং মিষ্টির রাজা <b>আম্রপালি</b> এই মাস জুড়েই বাজার দখল করে রাখে।</p>
+                
+                <h4>জুলাই থেকে আগস্ট</h4>
+                <p>মৌসুমের শেষের দিকে পাওয়া যায় <b>ফজলি</b>, <b>হাঁড়িভাঙা</b> (রংপুর অঞ্চল), <b>বারি-৪</b> এবং <b>আশ্বিনা</b> আম। নাবী জাতের (ল্যাটার ভ্যারাইটি) আমগুলোর মধ্যে এগুলোর কদর সবচেয়ে বেশি।</p>
+            `
+        },
+        'regions': {
+            icon: '🗺️',
+            title: 'আমের প্রধান উৎপাদন অঞ্চল',
+            content: `
+                <p>পুরো বাংলাদেশেই আমের চাষ হলেও, বাণিজ্যিক উৎপাদনে দেশের উত্তর ও উত্তর-পশ্চিমাঞ্চল এগিয়ে আছে।</p>
+
+                <h4>রাজশাহী ও চাঁপাইনবাবগঞ্জ</h4>
+                <p>ঐতিহ্যগতভাবে আমের রাজধানী বলা হয় এই অঞ্চলকে। ক্ষীরশাপাত, ল্যাংড়া, ফজলি ও আশ্বিনা আমের জন্য এই অঞ্চলের মাটি ও আবহাওয়া সবচেয়ে উপযোগী।</p>
+                
+                <h4>নওগাঁ</h4>
+                <p>সাম্প্রতিক বছরগুলোতে আম উৎপাদনে নওগাঁ জেলা সবাইকে ছাড়িয়ে গেছে। বিশেষ করে সাপাহার ও পোরশা উপজেলায় <b>আম্রপালি</b> ও <b>বারি-৪</b> আমের বিশাল সব বাগান গড়ে উঠেছে।</p>
+                
+                <h4>রংপুর ও দিনাজপুর</h4>
+                <p>রংপুরের মিঠাপুকুর ও বদরগঞ্জ এলাকা <b>হাঁড়িভাঙ্গা</b> আমের জন্য বিখ্যাত। এছাড়া দিনাজপুরেও প্রচুর উন্নত জাতের আম উৎপাদিত হয়।</p>
+                
+                <h4>সাতক্ষীরা ও মেহেরপুর</h4>
+                <p>সাতক্ষীরার আবহাওয়া উষ্ণ হওয়ায় এখানকার আম দেশের অন্যান্য অঞ্চলের চেয়ে আগে পাকে। এছাড়া মেহেরপুর ও চুয়াডাঙ্গাতেও দারুণ মিষ্টি আমের ফলন হয়।</p>
+            `
+        },
+        'economy': {
+            icon: '📈',
+            title: 'অর্থনীতি ও রপ্তানি',
+            content: `
+                <p>বাংলাদেশের অর্থনীতিতে আমের অবদান বিশাল। গ্রীষ্মকালীন ফল হিসেবে এটি একটি বড় অর্থকরী ফসল।</p>
+
+                <h4>বিশ্ব র‍্যাংকিং</h4>
+                <p>আম উৎপাদনে বাংলাদেশ বর্তমানে বিশ্বে <b>সপ্তম</b> স্থানে রয়েছে। দেশে প্রতি বছর প্রায় ২৫ লাখ মেট্রিক টনের বেশি আম উৎপাদিত হয়।</p>
+                
+                <h4>অভ্যন্তরীণ বাজার</h4>
+                <p>আমের মৌসুমে পরিবহন, প্যাকেজিং, এবং বিপণন মিলিয়ে কয়েক হাজার কোটি টাকার বাণিজ্য হয়। এতে লাখ লাখ মানুষের কর্মসংস্থান সৃষ্টি হয়।</p>
+                
+                <h4>রপ্তানি</h4>
+                <p>ফ্রুট ব্যাগিং প্রযুক্তির কল্যাণে এখন বাংলাদেশের আম যুক্তরাজ্য, ইতালি, সুইডেন, কুয়েত এবং মধ্যপ্রাচ্যের বিভিন্ন দেশে রপ্তানি হচ্ছে। রপ্তানিযোগ্য আমের মধ্যে হিমসাগর, ল্যাংড়া ও আম্রপালি প্রধান।</p>
+            `
+        },
+        'science': {
+            icon: '⚕️',
+            title: 'পুষ্টিগুণ ও স্বাস্থ্য উপকারিতা',
+            content: `
+                <p>আম শুধু খেতেই মজাদার নয়, এটি পুষ্টিগুণের এক বিশাল ভাণ্ডার:</p>
+                
+                <ul>
+                    <li><b>ভিটামিন এ এবং সি:</b> আমে রয়েছে প্রচুর পরিমাণে ভিটামিন-এ এবং ভিটামিন-সি, যা আমাদের চোখ ও ত্বকের জন্য দারুণ উপকারী।</li>
+                    <li><b>রোগ প্রতিরোধ:</b> এটি শরীরের রোগ প্রতিরোধ ক্ষমতা বাড়াতে সাহায্য করে।</li>
+                    <li><b>হজমশক্তি বৃদ্ধি:</b> আমে থাকা ডায়াটারি ফাইবার বা আঁশ হজমশক্তি বৃদ্ধি করে এবং কোষ্ঠকাঠিন্য দূর করতে দারুণ কার্যকরী।</li>
+                    <li><b>রক্তচাপ নিয়ন্ত্রণ:</b> পটাশিয়াম ও ম্যাগনেশিয়াম সমৃদ্ধ হওয়ায় এটি রক্তচাপ নিয়ন্ত্রণেও গুরুত্বপূর্ণ ভূমিকা রাখে।</li>
+                </ul>
+            `
+        },
+        'health_warnings': {
+            icon: '⚠️',
+            title: 'সতর্কতা ও অপকারিতা',
+            content: `
+                <p>"অতিরিক্ত কোনো কিছুই ভালো নয়"— আমের ক্ষেত্রেও কথাটি শতভাগ সত্যি:</p>
+                
+                <h4>অতিরিক্ত খাওয়ার ফল</h4>
+                <ul>
+                    <li>আমে ক্যালরির পরিমাণ বেশি থাকায় অতিরিক্ত আম খেলে ওজন দ্রুত বেড়ে যেতে পারে।</li>
+                    <li>একসাথে অনেক বেশি আম খেলে পেট খারাপ, বদহজম বা ডায়রিয়া হওয়ার ঝুঁকি থাকে।</li>
+                    <li>আমের বোঁটার কষ মুখে বা ত্বকে লাগলে অ্যালার্জি বা ঘা হতে পারে।</li>
+                </ul>
+
+                <h4>বিভিন্ন রোগীদের জন্য সতর্কতা</h4>
+                <ul>
+                    <li><b>ডায়াবেটিস রোগী:</b> আমে প্রচুর প্রাকৃতিক চিনি (ফ্রুক্টোজ) থাকে, যা রক্তে গ্লুকোজের মাত্রা দ্রুত বাড়িয়ে দেয়। তাই চিকিৎসকের বা ডায়েটিশিয়ানের পরামর্শ অনুযায়ী পরিমিত পরিমাণে (দিনে হয়তো ১-২ টুকরো) আম খাওয়া উচিত।</li>
+                    <li><b>কিডনি রোগী:</b> আমে পটাশিয়ামের পরিমাণ অনেক বেশি থাকে। তাই যাদের ক্রনিক কিডনি ডিজিজ (CKD) আছে, তাদের আম খাওয়ার আগে অবশ্যই ডাক্তারের পরামর্শ নিতে হবে।</li>
+                    <li><b>অ্যাজমা বা অ্যালার্জি:</b> যাদের অতিরিক্ত অ্যালার্জির সমস্যা আছে, তাদের আম খাওয়ার ক্ষেত্রে কিছুটা সতর্ক থাকা ভালো।</li>
+                </ul>
+            `
+        },
+        'tips_storage': {
+            icon: '💡',
+            title: 'খাওয়ার নিয়ম ও সংরক্ষণ',
+            content: `
+                <h4>খাওয়ার সঠিক সময় ও নিয়ম</h4>
+                <ul>
+                    <li>আম খাওয়ার সবচেয়ে ভালো সময় হলো সকালের নাস্তার পর অর্থাৎ মিড-মর্নিং অথবা দুপুরের দিকে।</li>
+                    <li>খালি পেটে অথবা রাতের বেলা ঘুমানোর ঠিক আগে আম খাওয়া পরিহার করা উচিত। এতে হজমে সমস্যা, গ্যাস্ট্রিক এবং এসিডিটি হতে পারে।</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <b>বিশেষ টিপস:</b> বাজার থেকে আম আনার পর খাওয়ার অন্তত ১-২ ঘণ্টা আগে তা পরিষ্কার পানিতে ডুবিয়ে রাখবেন। এতে আমের কষ ও ফাইটিক এসিড দূর হয়, যা শরীরের তাপমাত্রা স্বাভাবিক রাখতে সাহায্য করে এবং ব্রণের সমস্যা কমায়।
+                </div>
+
+                <h4>সংরক্ষণ পদ্ধতি</h4>
+                <ul>
+                    <li><b>কাঁচা আম:</b> সাধারণ তাপমাত্রায় কাগজের কার্টনে, পেপারে মুড়িয়ে বা খড়ের মধ্যে রাখলে প্রাকৃতিকভাবে পেকে যায়।</li>
+                    <li><b>পাকা আম:</b> বেশিদিন বাইরে রাখলে পচে যায়। তাই পাকার পর দুই-তিন দিনের জন্য ফ্রিজের নরমাল চেম্বারে সংরক্ষণ করতে পারেন (তবে বেশিদিন ফ্রিজে রাখলে স্বাদ কমে যায়)।</li>
+                    <li><b>দীর্ঘমেয়াদী:</b> সারা বছর আমের স্বাদ পেতে চাইলে আমের পাল্প বা ক্বাথ বের করে এয়ারটাইট বক্সে ডিপ ফ্রিজে সংরক্ষণ করা যায়।</li>
+                </ul>
+            `
+        },
+        'buying_guide': {
+            icon: '🕵️‍♂️',
+            title: 'রাসায়নিক মুক্ত আম চেনার উপায়',
+            content: `
+                <p>বাজার থেকে আম কেনার সময় ফরমালিন ও কার্বাইড মুক্ত আম চেনার কিছু উপায় নিচে দেওয়া হলো:</p>
+                
+                <ul>
+                    <li><b>ঘ্রাণ:</b> প্রাকৃতিকভাবে পাকা আমের বোঁটার কাছে খুব সুন্দর, মিষ্টি ও চেনা একটা ঘ্রাণ থাকে। রাসায়নিক দিয়ে পাকানো আমে এই প্রাকৃতিক ঘ্রাণ থাকে না।</li>
+                    <li><b>রং:</b> প্রাকৃতিকভাবে পাকা আমের গায়ে রঙের ভিন্নতা থাকে (কোথাও হলুদ, কোথাও হালকা সবুজ বা লালচে)। কিন্তু কার্বাইড বা কেমিক্যাল দেওয়া আম পুরোটা একই রকম নিখুঁত হলুদ রঙের হয়।</li>
+                    <li><b>ত্বক ও স্পর্শ:</b> প্রাকৃতিকভাবে পাকা আম হাতে ধরলে কিছুটা নরম অনুভূত হবে। ত্বকে কোনো সাদাটে পাউডারের মতো প্রলেপ থাকবে না।</li>
+                    <li><b>মাছির উপস্থিতি:</b> মিষ্টি ঘ্রাণের কারণে প্রাকৃতিকভাবে পাকা আমে মাছি বসতে দেখা যায়, কিন্তু কেমিক্যাল দেওয়া আমে সাধারণত মাছি বসে না।</li>
+                </ul>
+            `
+        },
+        'name_origins': {
+            icon: '📖',
+            title: 'আমের নামকরণের চমকপ্রদ গল্প',
+            content: `
+                <p>বাংলাদেশে প্রচলিত আমগুলোর নামের পেছনে রয়েছে শত শত বছরের ইতিহাস, লোককথা এবং দারুণ সব চমকপ্রদ ঘটনা। চলুন জেনে নিই বিখ্যাত কিছু আমের নামকরণের গল্প:</p>
+
+                <h4>১. ফজলি</h4>
+                <p>কথিত আছে, বাংলার প্রাচীন রাজধানী মালদহের গৌড় অঞ্চলে ফজলু বিবি নামের এক দরিদ্র বৃদ্ধা বাস করতেন। তাঁর বাড়ির উঠোনে একটি চমৎকার আমের গাছ ছিল। একদিন ওই এলাকার ইংরেজ কালেক্টর সাহেব ঘোড়ায় চড়ে যাওয়ার সময় পিপাসার্ত হয়ে ফজলু বিবির কাছে পানি চান। বৃদ্ধা পানির বদলে তাঁকে গাছের পাকা আম খেতে দেন। আম খেয়ে কালেক্টর সাহেব এতটাই মুগ্ধ হন যে তিনি এর নাম জানতে চান। বৃদ্ধা তখন নিজের নাম বলেন "ফজলু"। সেই ফজলু বিবির নাম থেকেই এই বিখ্যাত আমের নাম হয়ে যায় 'ফজলি'।</p>
+
+                <h4>২. ল্যাংড়া</h4>
+                <p>ভারতের বেনারসের (বারাণসী) এক পীর সাহেব পায়ে কিছুটা খুঁড়িয়ে হাঁটতেন, তাই সবাই তাঁকে 'ল্যাংড়া ফকির' বলে ডাকত। তাঁর আস্তানায় একটি চমৎকার আমের গাছ ছিল, যেখানকার আম তিনি তাঁর মুরিদদের খেতে দিতেন। এই সুস্বাদু আম পরে সেই ফকিরের নামানুসারেই 'ল্যাংড়া' হিসেবে বিশ্বজুড়ে পরিচিতি পায়।</p>
+
+                <h4>৩. হাঁড়িভাঙ্গা</h4>
+                <p>রংপুরের মিঠাপুকুর উপজেলার খোড়াগাছ ইউনিয়নের এক কৃষক নফল উদ্দিন গাছ লাগাতে খুব ভালোবাসতেন। তিনি একটি চমৎকার আমের চারা রোপণ করেছিলেন একটি ভাঙা হাঁড়ির ভেতর। সেই গাছটি বড় হয়ে দারুণ সুস্বাদু আম দিতে শুরু করে। মানুষ যখন জানতে চাইত এটি কোন গাছের আম, তখন বলা হতো "ওই যে ভাঙা হাঁড়ির ভেতরের গাছের আম"। সেই থেকে লোকমুখে এর নাম চিরকালের জন্য হয়ে যায় 'হাঁড়িভাঙ্গা'!</p>
+
+                <h4>৪. ক্ষীরসাপাত</h4>
+                <p>এই আমের শাঁস অত্যন্ত নরম, সম্পূর্ণ আঁশহীন এবং দুধের ঘন ক্ষীরের মতো মিষ্টি। ক্ষীরের মতো এমন অনন্য স্বাদ ও মসৃণতার কারণেই এই আমের নামকরণ করা হয়েছে 'ক্ষীরসাপাত'।</p>
+
+                <h4>৫. গোপালভোগ</h4>
+                <p>হিন্দু ধর্মাবলম্বীদের দেবতা শ্রীকৃষ্ণ বা গোপাল-এর অত্যন্ত প্রিয় ফল আম। প্রাচীনকালে এই সুগন্ধি ও সুমিষ্ট আমটি দেবতার ভোগ বা প্রসাদ হিসেবে নিবেদন করা হতো। দেবতার ভোগ থেকেই এর নাম হয়ে যায় 'গোপালভোগ' (গোপালের ভোগ)।</p>
+
+                <h4>৬. আম্রপালি</h4>
+                <p>প্রাচীন ভারতের বৈশালী নগরের বিখ্যাত, রূপবতী এবং ইতিহাস-কাঁপানো রাজনর্তকী 'আম্রপালী'র নামানুসারে এই সংকর জাতের আমের নামকরণ করা হয়েছে। ১৯৭১ সালে ভারতের কৃষি বিজ্ঞানীরা 'নিলম' ও 'দশেহরি' আমের পরাগায়ন ঘটিয়ে এই জাতটি তৈরি করেন এবং সুন্দরীর নামে এর নাম রাখেন।</p>
+
+                <h4>৭. আশ্বিনা</h4>
+                <p>নাম শুনেই বোঝা যায় এই আমের সাথে মাসের সম্পর্ক আছে। সাধারণত আমের ভরা মৌসুম যখন শেষ হয়ে যায়, অর্থাৎ বাংলা 'আশ্বিন' মাসে এই আম পাকে। আশ্বিন মাসে পাকে বলেই এর নাম দেওয়া হয়েছে 'আশ্বিনা' বা 'আশ্বিনী'।</p>
+
+                <h4>৮. গৌড়মতি</h4>
+                <p>চাঁপাইনবাবগঞ্জ ও এর আশেপাশের এলাকা প্রাচীনকালে 'গৌড়' সাম্রাজ্যের অংশ ছিল। আর 'মতি' মানে রত্ন বা মূল্যবান সম্পদ। গৌড় অঞ্চলের এক নতুন মূল্যবান রত্ন হিসেবে আবির্ভূত হওয়া এই সুমিষ্ট জাতটির নাম কৃষি সম্প্রসারণ অধিদপ্তর দিয়েছে 'গৌড়মতি'।</p>
+
+                <h4>৯. গোলাপখাস</h4>
+                <p>এই আমের গায়ে হালকা গোলাপি আভা থাকে এবং এর সুগন্ধে গোলাপ ফুলের এক দারুণ মিষ্টি আবেশ পাওয়া যায়। গোলাপের মতো সুবাস ও রঙের কারণেই এর নাম হয়েছে 'গোলাপখাস'।</p>
+
+                <h4>১০. কোহিতুর</h4>
+                <p>মুর্শিদাবাদের নবাব সিরাজউদ্দৌলার অত্যন্ত প্রিয় আম ছিল এটি। ফার্সি শব্দ 'কোহ' মানে পাহাড় আর 'তূর' হলো আরবের সেই পবিত্র তূর পাহাড়। তূর পাহাড়ের মতো এর শ্রেষ্ঠত্ব বোঝাতেই নবাব এর নাম রেখেছিলেন কোহিতুর। এই আম এতটাই রাজকীয় যে, নবাবরা এটি তুলার বিছানায় রেখে সংরক্ষণ করতেন!</p>
+
+                <h4>১১. রানীপছন্দ</h4>
+                <p>নাম শুনেই বোঝা যায় এটি কোনো এক রানীর খুব প্রিয় ছিল। কথিত আছে, মুর্শিদাবাদের নবাবদের কোনো এক রানীর অত্যন্ত প্রিয় আম ছিল এটি। রানীর পছন্দের কারণেই এর নাম হয়ে যায় 'রানীপছন্দ'।</p>
+
+                <h4>১২. চৌসা</h4>
+                <p>১৫৩৯ সালে 'চৌসা'র যুদ্ধে মুঘল সম্রাট হুমায়ুনকে পরাজিত করেন আফগান শাসক শের শাহ সুরি। সেই বিশাল বিজয় উদযাপনের জন্য শের শাহ সুরি নিজের প্রিয় একটি আমের নাম সেই যুদ্ধক্ষেত্রের নামানুসারে রাখেন 'চৌসা'!</p>
+
+                <h4>১৩. লক্ষণভোগ ও মোহনভোগ</h4>
+                <p>লক্ষণ নামের এক ব্যক্তি প্রথম এই আমের চাষ শুরু করেন বলে তার নামানুসারে এর নাম রাখা হয় 'লক্ষণভোগ'। অন্যদিকে, 'মোহনভোগ' আমটি অত্যন্ত সুমিষ্ট হওয়ায় একে মোহন বা শ্রীকৃষ্ণের ভোগ হিসেবে ধরা হতো।</p>
+
+                <h4>১৪. বউ-ভুলানো ও চৌধুরী পাগল</h4>
+                <p>গ্রাম-বাংলার মানুষের দেওয়া এই নামগুলো বেশ মজার। 'বউ-ভুলানো' আমের স্বাদ এতোটাই চমৎকার যে, রাগ করে থাকা বউয়ের মান ভাঙাতে এটি দারুণ কাজ করতো। আর 'চৌধুরী পাগল' আমটি খেয়ে এলাকার জমিদার বা চৌধুরী সাহেবরা নাকি পাগল হয়ে যেতেন, সেই জনশ্রুতি থেকেই এর এমন নাম!</p>
+            `
+        },
+        'recipes': {
+            icon: '🍽️',
+            title: 'আমের নানা পদ ও ব্যবহার',
+            content: `
+                <p>বাঙালির খাদ্যতালিকায় কাঁচা ও পাকা— দুই অবস্থাতেই আমের রয়েছে বহুমুখী ব্যবহার।</p>
+
+                <h4>কাঁচা আমের ব্যবহার</h4>
+                <ul>
+                    <li><b>আম ডাল:</b> গ্রীষ্মের দুপুরে মসুর ডালের সাথে কাঁচা আমের টুকরো এক প্রশান্তিদায়ক খাবার।</li>
+                    <li><b>আম পান্না (জুস):</b> পোড়া কাঁচা আমের সাথে পুদিনা পাতা, বিট লবণ ও চিনি মিশিয়ে তৈরি হয় দারুণ রিফ্রেশিং পানীয়।</li>
+                    <li><b>আচার ও চাটনি:</b> কাঁচা আম, সরিষার তেল ও পাঁচফোড়ন দিয়ে তৈরি হয় নানান পদের মুখরোচক আচার।</li>
+                    <li><b>আম কাসুন্দি:</b> আমের সাথে কাসুন্দির মিশ্রণ ভর্তা তৈরিতে অতুলনীয়।</li>
+                </ul>
+
+                <h4>পাকা আমের ব্যবহার</h4>
+                <ul>
+                    <li><b>দুধ-আম-ভাত:</b> পাকা আম চটকে দুধ ও ভাতের সাথে খাওয়া গ্রাম বাংলার ঐতিহ্য।</li>
+                    <li><b>আমসত্ত্ব:</b> পাকা আমের রস রোদে শুকিয়ে তৈরি করা হয় দীর্ঘস্থায়ী মুখরোচক আমসত্ত্ব।</li>
+                    <li><b>ডেজার্ট:</b> ম্যাংগো মিল্কশেক, আইসক্রিম, পুডিং এবং কেক তৈরিতে পাকা আমের জুড়ি মেলা ভার।</li>
+                </ul>
+            `
+        }
+    };
+
+    const modal = document.getElementById('detailsModal');
+    const mTitle = document.getElementById('m-title').querySelector('span:nth-child(2)');
+    const mIcon = document.getElementById('m-icon');
+    const mBody = document.getElementById('m-body');
+
+    function openModal(sectionKey) {
+        const data = encyclopediaData[sectionKey];
+        if(!data) return;
+
+        mIcon.innerText = data.icon;
+        mTitle.innerText = data.title;
+        mBody.innerHTML = data.content;
+        
+        // Reset scroll position
+        mBody.scrollTop = 0;
+        
+        modal.style.display = 'flex';
+        // Minor delay to ensure animation plays smoothly
+        setTimeout(() => {
+            modal.style.opacity = '1';
+        }, 10);
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking on the dark background overlay
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // Touch event for closing modal by swiping down (App-like feel)
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    modal.addEventListener('touchstart', e => {
+        touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+
+    modal.addEventListener('touchend', e => {
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+        // If swiped down significantly, close modal
+        if (touchEndY - touchStartY > 100) {
+            // Only close if we are at the top of the scrollable content to prevent accidental close while scrolling reading
+            if(mBody.scrollTop <= 0) {
+                closeModal();
+            }
+        }
+    }
+</script>
+</body>
+</html>
