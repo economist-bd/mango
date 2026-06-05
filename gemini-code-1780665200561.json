@@ -1,0 +1,16 @@
+{
+  "name": "বাংলাদেশের আম",
+  "short_name": "আম",
+  "description": "বাংলাদেশের আমের বৈজ্ঞানিক ও পুষ্টিগত তথ্য",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f9fbe7",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1514/1514981.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
